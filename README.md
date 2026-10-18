@@ -29,7 +29,7 @@ The **Pro pack** adds:
 - cost caps and webhook secrets
 - an AU compliance guide, setup docs and test scripts
 
-**Want the full Australian version?** The Tradie Missed-Call Pack (Pro) adds a quote form, owner alerts with reply forwarding, business-hours and after-hours messages, ClickSend support, dry-run mode, AI triage, SMS cost caps and full setup and compliance docs. Store link coming soon; questions to aussieflows@mail.grokbot.com.
+**Want the full Australian version?** The Tradie Missed-Call Pack (Pro) adds a quote form, owner alerts with reply forwarding, business-hours and after-hours messages, ClickSend support, dry-run mode, AI triage, SMS cost caps and full setup and compliance docs. [Get the Pro pack on Polar](https://buy.polar.sh/polar_cl_wNKkaDDNrlXuJJF3YzpJZGAGDE6wGRqWqPPYc24bL6h); questions to aussieflows@mail.grokbot.com.
 
 [Notify me when Pro is out](mailto:aussieflows@mail.grokbot.com?subject=Notify%20me%20-%20Tradie%20Missed-Call%20Pack).
 
