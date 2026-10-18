@@ -7,6 +7,8 @@ When you miss a call, the caller gets an instant SMS from your business number, 
 - 12-hour dedupe so repeat callers aren't spammed
 - STOP/START opt-out handling (Spam Act 2003: every text has your business name and "Reply STOP to opt out")
 
+Tested end-to-end in n8n with simulated APIs (a local mock of the Twilio API); no live SMS or email provider was used in testing.
+
 ## Setup (about 20 minutes)
 1. n8n → **Import from file** → `workflow/missed-call-textback-lite.n8n.json`.
 2. Open **Decide** and set `businessName`, `smsFrom` (your Twilio AU mobile number in +61 format) and `twilioAccountSid`.
