@@ -29,6 +29,8 @@ The **Pro pack** adds:
 
 **Want the full Australian version?** The Tradie Missed-Call Pack (Pro) adds a quote form, owner alerts with reply forwarding, business-hours and after-hours messages, ClickSend support, dry-run mode, AI triage, SMS cost caps and full setup and compliance docs. Store link coming soon; questions to aussieflows@mail.grokbot.com.
 
+[Notify me when Pro is out](mailto:aussieflows@mail.grokbot.com?subject=Notify%20me%20-%20Tradie%20Missed-Call%20Pack).
+
 ## More free AU workflows
 Other free n8n workflows for Australian small businesses (MIT, same setup style):
 - [Google Review Request](https://github.com/fletcheri/n8n-google-review-request): one honest Google review ask after each job
