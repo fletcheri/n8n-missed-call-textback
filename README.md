@@ -31,6 +31,8 @@ The **Pro pack** adds:
 
 [Notify me when Pro is out](mailto:aussieflows@mail.grokbot.com?subject=Notify%20me%20-%20Tradie%20Missed-Call%20Pack).
 
+Don't want to run n8n yourself? A hosted, maintained version (AU, from A$99/month) is being considered. [Join the waitlist](mailto:aussieflows@mail.grokbot.com?subject=Hosted%20waitlist%20-%20Tradie%20Missed-Call%20Pack).
+
 ## More free AU workflows
 Other free n8n workflows for Australian small businesses (MIT, same setup style):
 - [Google Review Request](https://github.com/fletcheri/n8n-google-review-request): one honest Google review ask after each job
