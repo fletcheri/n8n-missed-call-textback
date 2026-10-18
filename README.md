@@ -27,6 +27,13 @@ The **Pro pack** adds:
 - cost caps and webhook secrets
 - an AU compliance guide, setup docs and test scripts
 
-**Want the full Australian version?** The Tradie Missed-Call Pack adds a quote form, ClickSend support, AU number handling, Spam Act opt-out templates, AI triage and full setup docs. Store link coming soon; questions to aussieflows@mail.grokbot.com.
+**Want the full Australian version?** The Tradie Missed-Call Pack (Pro) adds a quote form, owner alerts with reply forwarding, business-hours and after-hours messages, ClickSend support, dry-run mode, AI triage, SMS cost caps and full setup and compliance docs. Store link coming soon; questions to aussieflows@mail.grokbot.com.
+
+## More free AU workflows
+Other free n8n workflows for Australian small businesses (MIT, same setup style):
+- [Google Review Request](https://github.com/fletcheri/n8n-google-review-request): one honest Google review ask after each job
+- [Quote Follow-Up](https://github.com/fletcheri/n8n-quote-follow-up): a polite follow-up SMS after you send a quote
+- [Booking Reminder](https://github.com/fletcheri/n8n-booking-reminder): a reminder SMS before each booking
+- [Overdue Invoice Reminder](https://github.com/fletcheri/n8n-overdue-invoice-reminder): an overdue-invoice email a week after the due date
 
 MIT licence. Not legal advice.
