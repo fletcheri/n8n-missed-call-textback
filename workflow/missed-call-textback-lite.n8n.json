@@ -1,0 +1,202 @@
+{
+  "name": "Missed-Call Text-Back (Lite) v1.0",
+  "nodes": [
+    {
+      "id": "node-101",
+      "name": "Sticky: Start here",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -300
+      ],
+      "parameters": {
+        "width": 460,
+        "height": 220,
+        "content": "## Missed-Call Text-Back (Lite, MIT)\n1. Edit CONFIG in **Decide**.\n2. Set Twilio Basic Auth credentials (Account SID / Auth Token) on **Send SMS (Twilio)**.\n3. Activate. Point your Twilio number's Voice webhook at `/webhook/missed-call` and Messaging webhook at `/webhook/sms-inbound`.\nWant quote forms, owner alerts, ClickSend, business hours and AI triage? See the Pro pack."
+      }
+    },
+    {
+      "id": "node-102",
+      "name": "Missed call",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "7a9b8c6d-2e1f-4a3b-8c5d-6e7f8a9b0c11",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "missed-call",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-103",
+      "name": "Inbound SMS",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        200
+      ],
+      "webhookId": "7a9b8c6d-2e1f-4a3b-8c5d-6e7f8a9b0c12",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sms-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-104",
+      "name": "Decide",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        100
+      ],
+      "parameters": {
+        "jsCode": "// Missed-Call Text-Back (Lite) - MIT licence. Edit CONFIG, leave the rest.\nconst CONFIG = {\n  businessName: 'Smith Plumbing',\n  smsFrom: '+61400000001',                       // your Twilio AU mobile number\n  twilioAccountSid: 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',\n  twilioBaseUrl: 'https://api.twilio.com',\n  dedupeHours: 12,\n  message: \"Hi, it's {business}. Sorry we missed your call - we're on a job. Reply with what you need and we'll get back to you. Reply STOP to opt out\",\n  voiceMessage: 'Sorry we missed your call. We will text you right now.',\n};\n\nconst req = $input.first().json;\nconst body = req.body || {};\nconst store = $getWorkflowStaticData('global');\nstore.optOut = store.optOut || {};\nstore.lastTexted = store.lastTexted || {};\nconst now = Date.now();\nfunction toE164AU(raw) {\n  let s = String(raw || '').replace(/[\\s\\-().]/g, '');\n  if (/^0[2-9]\\d{8}$/.test(s)) s = '+61' + s.slice(1);\n  else if (/^61[2-9]\\d{8}$/.test(s)) s = '+' + s;\n  return /^\\+\\d{8,15}$/.test(s) ? s : null;\n}\nconst from = toE164AU(body.From || body.from);\nconst isMobile = /^\\+614\\d{8}$/.test(from || '');\nconst xml = inner => ({ contentType: 'text/xml', body: '<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response>' + inner + '</Response>' });\nlet sms = null, response, action;\n\nif (body.CallSid || req.webhookUrl?.endsWith('missed-call')) {\n  if (isMobile && !store.optOut[from] && !(store.lastTexted[from] > now - CONFIG.dedupeHours * 3600000)) {\n    sms = { to: from, body: CONFIG.message.replace('{business}', CONFIG.businessName) };\n    store.lastTexted[from] = now;\n    action = 'texted';\n  } else action = 'skipped';\n  response = xml(`<Say language=\"en-AU\">${CONFIG.voiceMessage}</Say><Hangup/>`);\n} else {\n  const text = String(body.Body || body.body || '').trim();\n  if (from && /^(stop|stopall|unsubscribe|cancel|end|quit)\\b/i.test(text)) { store.optOut[from] = new Date().toISOString(); action = 'opted-out'; }\n  else if (from && /^(start|unstop)\\b/i.test(text)) { delete store.optOut[from]; action = 'opted-in'; }\n  else action = 'reply-received (read it in your Twilio console or upgrade to Pro for owner alerts)';\n  response = xml('');\n}\nif (sms) sms = { ...sms, from: CONFIG.smsFrom, accountSid: CONFIG.twilioAccountSid, baseUrl: CONFIG.twilioBaseUrl };\nreturn [{ json: { action, from, sms, response } }];\n"
+      }
+    },
+    {
+      "id": "node-105",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        100
+      ],
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.response.body }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "={{ $json.response.contentType }}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "node-106",
+      "name": "Anything to send?",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        100
+      ],
+      "parameters": {
+        "jsCode": "// Pass on only items that have an SMS to send\nreturn $input.all().filter(i => i.json.sms);"
+      }
+    },
+    {
+      "id": "node-107",
+      "name": "Send SMS (Twilio)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        980,
+        100
+      ],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.sms.baseUrl }}/2010-04-01/Accounts/{{ $json.sms.accountSid }}/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "={{ $json.sms.to }}"
+            },
+            {
+              "name": "From",
+              "value": "={{ $json.sms.from }}"
+            },
+            {
+              "name": "Body",
+              "value": "={{ $json.sms.body }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Missed call": {
+      "main": [
+        [
+          {
+            "node": "Decide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inbound SMS": {
+      "main": [
+        [
+          {
+            "node": "Decide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond": {
+      "main": [
+        [
+          {
+            "node": "Anything to send?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anything to send?": {
+      "main": [
+        [
+          {
+            "node": "Send SMS (Twilio)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Australia/Brisbane"
+  },
+  "pinData": {}
+}
